@@ -1,354 +1,57 @@
-# Confectionery Enterprise
+# Stitch Modern Shop
 
-Premium qandolat ishlab chiqaruvchi korxona uchun to'liq stack e-commerce platformasi.
+> A Django e-commerce backend prototype with a partial storefront integration. This repository is not currently a complete, production-ready online shop.
 
-## Texnologiyalar
+## Overview
 
-- **Frontend:** Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS
-- **Backend:** Django 5, Django REST Framework, SimpleJWT
-- **Database:** PostgreSQL 16 (dev: SQLite)
-- **Cache:** Redis 7
-- **Task Queue:** Celery
-- **Deployment:** Docker Compose, Nginx
+The codebase contains Django applications for catalog, accounts, cart, orders and related storefront workflows. The repository also contains a large checked-in Python virtual environment and a frontend gitlink whose source is not present in this checkout. Review those repository contents before attempting a full local setup.
 
----
+## Current capabilities
 
-## Tezkor ishga tushirish (Docker)
+- Django backend with product and account-related application modules.
+- Cart and order data models and API routes.
+- Docker and Compose configuration for local services.
+- A small backend test suite; several tests are placeholders and do not establish end-to-end behavior.
 
-### 1. Docker o'rnatilgan bo'lishi kerak
+Payment processing is not connected to a payment provider. The current code records application state and must not be treated as handling real payments. The frontend source is not available in this repository checkout.
 
-```bash
-docker --version
-docker compose version
-```
+## Technology
 
-### 2. Loyihani clone qiling
+Python, Django, Django REST Framework, PostgreSQL-oriented configuration, Docker and Docker Compose. Confirm exact dependency versions in the backend requirements file.
 
-```bash
-git clone <repository-url>
-cd stitch_modern_shirinliklar_do_koni_platformasi
-```
+## Architecture and layout
 
-### 3. Bitta buyruq bilan ishga tushiring
+The backend is organized into Django apps for the shop's domains. Compose files describe local service orchestration. A frontend gitlink is present, but its submodule metadata/source is incomplete, so the UI cannot be reconstructed from this repository alone.
 
-```bash
-docker compose up --build -d
-```
+## Setup
 
-Bu buyruq quyidagilarni avtomatik bajaradi:
-- PostgreSQL ma'lumotlar bazasini yaratadi
-- Redis cache ni ishga tushiradi
-- Backend (Django) containerini build qiladi va ishga tushiradi
-- Frontend (Next.js) containerini build qiladi
-- Nginx reverse proxy ni ishga tushiradi
-- Celery worker va beat ni ishga tushiradi
-- Ma'lumotlar bazasini migrate qiladi
-- Demo ma'lumotlarni yuklaydi
+1. Clone the repository and inspect its submodule status and Docker configuration.
+2. Create a virtual environment and install dependencies from the backend requirements file.
+3. Configure a local environment file using non-production values. Do not reuse credentials committed in repository history.
+4. Start the configured database and application services, then apply Django migrations.
 
-### 4. Saytni oching
+Exact commands and required variables depend on the checked-in Compose and settings files; verify them before running. The checked-in environment file contains credential material and should be treated as exposed.
 
-- **Asosiy sayt:** http://localhost
-- **Backend API:** http://localhost/api/
-- **Django Admin:** http://localhost/admin/
-- **Swagger Docs:** http://localhost/api/docs/
+## Configuration and API
 
----
+The Django settings and Compose configuration define environment-dependent database and application settings. There is no reliable, verified API reference in the current repository documentation; inspect URL configuration and schema output in a local development instance before integrating clients.
 
-## Demo hisoblar
+## Data and tests
 
-| Login | Parol | Rol |
-|-------|-------|-----|
-| admin | admin123 | Super Admin |
-| user1 | user1234 | Customer |
-| user2 | user1234 | Customer |
+The backend uses Django models and a local SQLite database is tracked in the repository. The available tests include placeholders and do not verify checkout or payment workflows. No test results are claimed here.
 
----
+## Deployment and security
 
-## LAN (Local Network) ishlatish
+Deployment is not documented as a validated production process. Before deployment, remove exposed credentials from active configuration, rotate any real values that have appeared in Git history, use secret storage, disable debug mode, configure allowed hosts, and implement provider-verified payment callbacks. Do not deploy this prototype for real transactions.
 
-Agar loyiha mahalliy tarmoqda boshqa qurilmalar uchun ochiq bo'lishi kerak bo'lsa:
+## Screenshots
 
-### 1. `.env` fayl yarating (ixtiyoriy)
+No verified screenshots are available in this repository.
 
-Loyiha ildiz papkasida `.env` fayl yarating:
+## Future work
 
-```bash
-# Loyiha IP manzilingizni kiriting
-COMPOSE_PROJECT_NAME=confectionery
-```
-
-### 2. Docker Compose ishga tushiring
-
-```bash
-docker compose up --build -d
-```
-
-### 3. Boshqa qurilmalardan kiring
-
-Kompyuteringizning IP manzilini toping:
-
-```bash
-# Windows
-ipconfig
-
-# Linux/Mac
-ip addr show
-```
-
-Keyin boshqa qurilmalardan quyidagi manzillar orqali kiring:
-
-- **Asosiy sayt:** `http://192.168.x.x` (masalan, `http://192.168.100.15`)
-- **Backend API:** `http://192.168.x.x/api/`
-- **Django Admin:** `http://192.168.x.x/admin/`
-- **Swagger Docs:** `http://192.168.x.x/api/docs/`
-
-### 4. CORS sozlamalari
-
-Backend `ALLOWED_HOSTS` va `CORS_ALLOWED_ORIGINS` sozlamalari `*` (hamma uchun) ga o'rnatilgan. Agar xavfsizlikni kuchaytirmoqchi bo'lsangiz, `docker-compose.yml` faylida `ALLOWED_HOSTS` va `CORS_ALLOWED_ORIGINS` ni ma'lum IP manzillar bilan almashtiring:
-
-```yaml
-environment:
-  - ALLOWED_HOSTS=*,localhost,192.168.100.15
-  - CORS_ALLOWED_ORIGINS=http://localhost,http://localhost:3000,http://192.168.100.15
-```
-
----
-
-## Qo'lda ishga tushirish (Docker holda)
-
-### Backend
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env  # .env faylini sozlang
-python manage.py migrate
-python seed.py
-python manage.py runserver
-```
-
-Backend: http://localhost:8000
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend: http://localhost:3000
-
----
-
-## Docker buyruqlari
-
-### Loyihani ishga tushirish
-```bash
-docker compose up --build -d
-```
-
-### Loglarni ko'rish
-```bash
-docker compose logs -f
-```
-
-### Backend loglarini ko'rish
-```bash
-docker compose logs -f backend
-```
-
-### Frontend loglarini ko'rish
-```bash
-docker compose logs -f frontend
-```
-
-### Nginx loglarini ko'rish
-```bash
-docker compose logs -f nginx
-```
-
-### Barcha containerlarni to'xtatish
-```bash
-docker compose down
-```
-
-### Barcha containerlarni va ma'lumotlarni o'chirish
-```bash
-docker compose down -v
-```
-
-### Qayta build qilish
-```bash
-docker compose up --build -d
-```
-
-### Backend shell ga kirish
-```bash
-docker compose exec backend bash
-```
-
-### Django command bajarish
-```bash
-docker compose exec backend python manage.py <command>
-```
-
-### Ma'lumotlar bazasiga kirish
-```bash
-docker compose exec db psql -U postgres -d shirinliklar_db
-```
-
----
-
-## API Endpoints
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/users/register/` | POST | Ro'yxatdan o'tish |
-| `/api/users/login/` | POST | Tizimga kirish (JWT) |
-| `/api/users/token/refresh/` | POST | Token yangilash |
-| `/api/users/profile/` | GET/PATCH | Profil |
-| `/api/users/change-password/` | POST | Parol o'zgartirish |
-| `/api/users/logout/` | POST | Chiqish |
-| `/api/products/` | GET | Mahsulotlar ro'yxati |
-| `/api/products/{slug}/` | GET | Mahsulot tafsiloti |
-| `/api/products/popular/` | GET | Mashhur mahsulotlar |
-| `/api/products/featured/` | GET | Tanlangan mahsulotlar |
-| `/api/products/new/` | GET | Yangi mahsulotlar |
-| `/api/products/{slug}/related/` | GET | O'xshash mahsulotlar |
-| `/api/categories/` | GET | Kategoriyalar |
-| `/api/products/brands/` | GET | Brendlar |
-| `/api/cart/` | GET | Savat |
-| `/api/cart/add/` | POST | Savatga qo'shish |
-| `/api/cart/item/{id}/` | PATCH/DELETE | Savat elementi |
-| `/api/orders/` | GET/POST | Buyurtmalar |
-| `/api/orders/{id}/` | GET | Buyurtma tafsiloti |
-| `/api/orders/{id}/cancel/` | POST | Buyurtmani bekor qilish |
-| `/api/orders/validate-coupon/` | POST | Kupon tekshirish |
-| `/api/orders/addresses/` | GET/POST | Manzillar |
-| `/api/favorites/` | GET | Sevimlilar |
-| `/api/favorites/toggle/` | POST | Sevimlilarga qo'shish/olish |
-| `/api/reviews/product/{id}/` | GET/POST | Sharhlar |
-| `/api/notifications/` | GET | Bildirishnomalar |
-| `/api/news/` | GET | Yangiliklar |
-| `/api/gallery/categories/` | GET | Galereya kategoriyalari |
-| `/api/gallery/images/` | GET | Galereya rasmlari |
-| `/api/certificates/` | GET | Sertifikatlar |
-| `/api/pages/company/` | GET | Kompaniya haqida |
-| `/api/pages/partnership/` | POST | Hamkorlik arizasi |
-| `/api/contacts/` | POST | Kontakt xabar |
-| `/api/common/dashboard/` | GET | Admin dashboard (admin) |
-| `/api/orders/admin/orders/` | GET | Barcha buyurtmalar (admin) |
-| `/api/orders/admin/orders/{id}/status/` | POST | Status o'zgartirish (admin) |
-| `/api/news/admin/` | GET/POST | Yangiliklar boshqaruvi (admin) |
-| `/api/gallery/admin/images/` | GET/POST | Galereya boshqaruvi (admin) |
-| `/api/certificates/admin/` | GET/POST | Sertifikatlar boshqaruvi (admin) |
-
----
-
-## Frontend sahifalar
-
-### Foydalanuvchi sahifalari
-| Route | Sahifa |
-|---|---|
-| `/` | Bosh sahifa |
-| `/products` | Mahsulotlar katalogi |
-| `/products/[slug]` | Mahsulot tafsilotlari |
-| `/cart` | Savat |
-| `/checkout` | Buyurtma berish |
-| `/orders` | Buyurtmalarim |
-| `/wishlist` | Sevimlilar |
-| `/profile` | Profil |
-| `/auth/login` | Tizimga kirish |
-| `/auth/register` | Ro'yxatdan o'tish |
-| `/about` | Biz haqimizda |
-| `/contact` | Kontakt |
-| `/news` | Yangiliklar |
-| `/gallery` | Galereya |
-
-### Admin sahifalari
-| Route | Sahifa |
-|---|---|
-| `/admin/dashboard` | Dashboard |
-| `/admin/products` | Mahsulotlar boshqaruvi |
-| `/admin/categories` | Kategoriyalar |
-| `/admin/orders` | Buyurtmalar |
-| `/admin/customers` | Mijozlar |
-| `/admin/news` | Yangiliklar |
-| `/admin/gallery` | Galereya |
-| `/admin/certificates` | Sertifikatlar |
-| `/admin/contacts` | Kontakt xabarlar |
-| `/admin/partnerships` | Hamkorlik arizalari |
-| `/admin/analytics` | Analytics |
-| `/admin/notifications` | Bildirishnomalar |
-| `/admin/settings` | Sozlamalar |
-| `/admin/roles` | Rollar va ruxsatlar |
-
----
-
-## Backend modellar
-
-- **User** - Foydalanuvchilar (role, phone, avatar)
-- **Category** - Mahsulot kategoriyalari
-- **Brand** - Brendlar
-- **Product** - Mahsulotlar (narx, reyting, SKU, zaxira)
-- **ProductImage** - Mahsulot rasmlari
-- **ProductVariant** - Mahsulot variantlari
-- **Cart/CartItem** - Savat
-- **Order/OrderItem** - Buyurtmalar (8 ta status)
-- **Coupon** - Kuponlar
-- **Address** - Manzillar
-- **Review** - Sharhlar
-- **Favorite** - Sevimlilar (Wishlist)
-- **Notification** - Bildirishnomalar
-- **Payment** - To'lovlar
-- **News** - Yangiliklar
-- **GalleryImage/GalleryCategory** - Galereya
-- **Certificate** - Sertifikatlar
-- **Company** - Kompaniya ma'lumotlari
-- **PartnershipRequest** - Hamkorlik arizalari
-- **ContactMessage** - Kontakt xabarlar
-- **SiteSettings** - Sayt sozlamalari
-
----
-
-## Buyurtma statuslari
-
-1. `pending` - Kutilmoqda
-2. `confirmed` - Tasdiqlandi
-3. `processing` - Ishlab chiqarilmoqda
-4. `packaging` - Qadoqlanmoqda
-5. `delivering` - Yetkazilmoqda
-6. `delivered` - Yetkazib berilgan
-7. `cancelled` - Bekor qilindi
-8. `refunded` - Qaytarilgan
-
----
-
-## Rollar
-
-| Rol | Tavsif |
-|---|---|
-| `superadmin` | To'liq boshqaruv huquqi |
-| `admin` | Mahsulotlar va buyurtmalarni boshqarish |
-| `manager` | Buyurtmalarni ko'rish va o'zgartirish |
-| `customer` | Oddiy foydalanuvchi |
-
----
-
-## Production deployment
-
-1. `docker-compose.yml` faylida `DJANGO_SECRET_KEY` ni o'zgartiring
-2. `ALLOWED_HOSTS` ga domen nomini qo'shing
-3. `CORS_ALLOWED_ORIGINS` ga frontend domenini qo'shing
-4. SSL sertifikat o'rnating (Let's Encrypt)
-5. Nginx konfiguratsiyasini yangilang
-6. Database backup tartibini o'rnating
-
----
-
-## Litsenziya
-
-Barcha huquqlar himoyalangan.
+- Restore and document the frontend source and its submodule metadata.
+- Add reproducible dependency and environment setup.
+- Replace local development defaults and remove generated artifacts from version control.
+- Implement and test real payment-provider verification before enabling checkout.
+- Add meaningful API and integration tests.
